@@ -6,7 +6,7 @@ pipeline {
         stage('Checkout Code') {
             steps {
                 git branch: 'feature-1',
-                    url: 'https://github.com/<your-username>/<your-repo>.git'
+                    url: 'https://github.com/Sandeepdevops22/Parcel-service.git'
             }
         }
 
