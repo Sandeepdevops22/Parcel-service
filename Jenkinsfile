@@ -1,76 +1,90 @@
 pipeline {
     agent any
 
-    tools {
-        jdk 'java17'
-        maven 'maven3'
-    }
-
     stages {
+
         stage('Checkout Code') {
             steps {
-                checkout scm
+                git branch: 'main',
+                    url: 'https://github.com/<your-username>/<your-repo>.git'
             }
         }
 
-        stage('Build with Maven') {
+        stage('Setup Environment') {
             steps {
-                sh 'mvn clean package -DskipTests'
+                sh '''
+                echo "Installing Java 17 & Maven..."
+
+                # Install Java 17
+                if ! java -version &>/dev/null; then
+                    sudo apt update
+                    sudo apt install -y openjdk-17-jdk
+                fi
+
+                # Set JAVA_HOME
+                JAVA_HOME_PATH=$(dirname $(dirname $(readlink -f $(which java))))
+                export JAVA_HOME=$JAVA_HOME_PATH
+                export PATH=$JAVA_HOME/bin:$PATH
+
+                # Install Maven
+                if ! mvn -version &>/dev/null; then
+                    sudo apt install -y maven
+                fi
+
+                echo "Java & Maven setup complete."
+                java -version
+                mvn -version
+                '''
             }
         }
 
-        stage('Archive Artifact') {
+        stage('Build Maven Project') {
             steps {
-                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
-                echo "Artifact archived successfully."
+                sh 'mvn clean package'
             }
         }
 
-        stage('Run Application & Validate') {
+        stage('Run Spring Boot App') {
             steps {
-                script {
-                    echo "Starting Spring Boot App..."
-
-                    // Run app in background
-                    sh 'nohup java -jar target/*.jar > app.log 2>&1 & echo $! > app.pid'
-
-                    sleep 10
-
-                    echo "Checking if app started..."
-
-                    def status = sh(script: 'curl --write-out "%{http_code}" --silent --output /dev/null http://localhost:8080', 
-                                     returnStdout: true).trim()
-
-                    if (status != "200") {
-                        error "App failed to start! HTTP Status: ${status}"
-                    } else {
-                        echo "App started successfully ✔"
-                    }
-                }
+                sh '''
+                echo "Starting Spring Boot app..."
+                nohup mvn spring-boot:run &
+                sleep 15
+                '''
             }
         }
 
-        stage('Wait 5 minutes') {
+        stage('Validate Application') {
             steps {
-                echo 'Keeping app running for 5 minutes...'
-                sleep(time: 5, unit: 'MINUTES')
+                sh '''
+                echo "Checking if application is running..."
+
+                RESPONSE=$(curl --write-out "%{http_code}" --silent --output /dev/null http://localhost:8080)
+
+                if [ "$RESPONSE" -eq 200 ]; then
+                    echo "Application started successfully..."
+                else
+                    echo "Application failed to start. HTTP Response Code: $RESPONSE"
+                    exit 1
+                fi
+                '''
             }
         }
 
-        stage('Stop Application') {
+        stage('Wait for 5 Minutes') {
             steps {
-                script {
-                    echo "Stopping app..."
-                    sh 'kill $(cat app.pid) || true'
-                }
+                sh '''
+                echo "Holding app live for 5 minutes..."
+                sleep 300
+                '''
             }
         }
-    }
 
-    post {
-        always {
-            echo "Post cleanup..."
-            sh 'pkill -f "java -jar" || true'
+        stage('Stop Spring Boot App') {
+            steps {
+                sh 'mvn spring-boot:stop'
+            }
         }
+
     }
 }
