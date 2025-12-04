@@ -1,5 +1,5 @@
 pipeline {
-   agent { label 'java' }
+   agent { label 'slave3' }
      // agent any
     tools {
         jdk 'JDK17'
@@ -10,7 +10,7 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git branch: 'feature-1', url: 'https://github.com/Sandeepdevops22/Parcel-service.git'
+                git branch: 'feature-2', url: 'https://github.com/Sandeepdevops22/Parcel-service.git'
             }
         }
 

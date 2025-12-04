@@ -4,7 +4,7 @@ Shell script to setup the environment.
 set -e
 echo "Starting Maven project setup..."
 
-# Step 1: Install Java 17
+# Step 1: Install Java 11
 if ! java -version &>/dev/null; then
     echo "Installing Java 17..."
     sudo apt update
@@ -35,6 +35,7 @@ else
     echo "Maven is already installed:"
     mvn -version
 fi
+
 echo "Environment setup completed. You can now build and run the application manually."
 Build the project manually
 mvn clean install
