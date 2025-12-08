@@ -6,7 +6,7 @@ pipeline {
         jdk 'JDK17'
         maven 'maven'
     }
-
+    stages {
         stage('Build') {
            steps {
                 script {
@@ -25,5 +25,5 @@ pipeline {
             }
     }
 }
-
+}
 
