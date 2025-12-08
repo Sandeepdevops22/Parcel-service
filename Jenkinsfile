@@ -1,32 +1,20 @@
+@Library('Shared_lib') _
 pipeline {
-   agent { label 'slave3' }
+   agent { label 'slave1' }
      // agent any
     tools {
         jdk 'JDK17'
         maven 'maven'
     }
 
-   stages {
-
-        stage('Checkout') {
-            steps {
-                git branch: 'feature-2', url: 'https://github.com/Sandeepdevops22/Parcel-service.git'
-            }
-        }
-
         stage('Build') {
-            steps {
-                sh 'mvn clean package -DskipTests=false'
+           steps {
+                script {
+                        build('install')  
+                }
             }
         }
-
-        stage('Archive Artifact') {
-            steps {
-                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
-            }
-        }
-
-        stage('Run Application') {
+ stage('Run Application') {
             steps {
                   sh 'mvn spring-boot:run'
                   dir('/var/lib/jenkins/workspace/Parcel_service_feature-1/target') {
@@ -34,9 +22,9 @@ pipeline {
                      //   nohup java -jar simple-parcel-service-app-1.0-SNAPSHOT.jar > app.log 2>&1 &
                         //echo "Application started"
                    """
-                   
-                }
-            }
         }
+    }
+}
+
     }
 }
