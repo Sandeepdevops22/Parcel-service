@@ -17,12 +17,12 @@ pipeline {
  stage('Run Application') {
             steps {
                   sh 'mvn spring-boot:run'
-                  dir('/var/lib/jenkins/workspace/Parcel_service_feature-1/target') {
-                   sh """
+                 // dir('/var/lib/jenkins/workspace/Parcel_service_feature-1/target') {
+                  // sh """
                      //   nohup java -jar simple-parcel-service-app-1.0-SNAPSHOT.jar > app.log 2>&1 &
                         //echo "Application started"
-                   """
-        }
+                 //  """
+            }
     }
 }
 
