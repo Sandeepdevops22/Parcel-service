@@ -14,7 +14,7 @@ jobs:
 
       # Upload the built artifact (e.g., .jar files) with versioning based on commit SHA
       - name: Upload Artifacts with Versioning
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: my-app-artifact-${{ github.sha }}  # Artifact version based on commit SHA
           path: target/*.jar  # Path to the built artifact (e.g., JAR file or other build outputs)
