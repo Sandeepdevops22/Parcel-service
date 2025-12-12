@@ -1,14 +1,15 @@
 name: Build & Run Spring Boot App
+
 on:
   push:
     branches:
       - main
- 
+
 jobs:
   build:
-    runs-on: ubuntu-latest 
+    runs-on: ubuntu-latest
 
-    steps: 
+    steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -20,6 +21,25 @@ jobs:
 
       - name: Build with Maven
         run: mvn clean package
+
+      - name: Install JFrog CLI
+        run: |
+          curl -fL https://install-cli.jfrog.io | sh
+
+      - name: Configure JFrog CLI server
+        run: |
+          jf config add my-jfrog-server \
+            --url="${{ secrets.JFROG_URL }}" \
+            --user="${{ secrets.JFROG_USER }}" \
+            --password="${{ secrets.JFROG_PASSWORD }}" \
+            --interactive=false
+
+      - name: Upload artifact to JFrog Artifactory
+        run: |
+          jf rt upload \
+            "target/*.jar" \
+            "${{ secrets.JFROG_REPO }}/springboot-app/" \
+            --server-id=my-jfrog-server
 
       - name: Run Spring Boot Application
         run: mvn spring-boot:run
