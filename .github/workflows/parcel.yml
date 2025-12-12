@@ -38,6 +38,5 @@ jobs:
         run: |
           jf rt upload "target/*.jar" "${{ secrets.JFROG_REPO }}/springboot-app/" --server-id=my-jfrog-server
 
-
       - name: Run Spring Boot Application
         run: mvn spring-boot:run
