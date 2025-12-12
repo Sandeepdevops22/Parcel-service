@@ -1,5 +1,4 @@
 name: Build & Run Spring Boot App
-
 on:
   push:
     branches:
@@ -7,7 +6,7 @@ on:
  
 jobs:
   build:
-    runs-on: self-hosted  # matches Jenkins agent label
+    runs-on: ubuntu-latest # matches Jenkins agent label
 
     steps: 
       - name: Checkout repository
