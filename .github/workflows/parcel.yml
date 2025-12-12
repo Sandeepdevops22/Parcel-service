@@ -29,9 +29,9 @@ jobs:
       - name: Configure JFrog CLI server
         run: |
           jf config add my-jfrog-server \
-            --url="${{ secrets.https://trialea6yjn.jfrog.io }}" \
-            --user="${{ secrets.sandeepmgvr2210@zohomail.in }}" \
-            --password="${{ secrets.2210wccS@1994 }}" \
+            --url="${{ secrets.JFROG_URL }}" \
+            --user="${{ secrets.JFROG_USER }}" \
+            --password="${{ secrets.JFROG_PASSWORD }}" \
             --interactive=false
 
       - name: Upload artifact to JFrog Artifactory
