@@ -22,11 +22,13 @@ jobs:
       - name: Build with Maven
         run: mvn clean package
 
+      # Install JFrog CLI
       - name: Install JFrog CLI
         run: |
           curl -fL https://install-cli.jfrog.io | sh
 
-      - name: Configure JFrog CLI server
+      # Configure connection to JFrog Server
+      - name: Configure JFrog CLI
         run: |
           jf config add my-jfrog-server \
             --url="${{ secrets.JFROG_URL }}" \
@@ -34,9 +36,14 @@ jobs:
             --password="${{ secrets.JFROG_PASSWORD }}" \
             --interactive=false
 
-      - name: Upload artifact to JFrog Artifactory
+      # Upload the JAR file to Artifactory (maven-local repo)
+      - name: Upload Artifact to JFrog Artifactory
         run: |
-          jf rt upload "target/*.jar" "${{ secrets.JFROG_REPO }}/springboot-app/" --server-id=my-jfrog-server
+          jf rt upload \
+            "target/*.jar" \
+            "maven-local/springboot-app/" \
+            --server-id=my-jfrog-server
 
+      # Run Spring Boot App
       - name: Run Spring Boot Application
         run: mvn spring-boot:run
